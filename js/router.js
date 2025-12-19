@@ -67,7 +67,6 @@ function RenderContactPage() {
     });
 }
 
-// Implementacja Galerii
 async function RenderGalleryPage() {
     document.querySelector('main').innerHTML = `
         <h1 class="title">Gallery</h1>
@@ -78,40 +77,54 @@ async function RenderGalleryPage() {
 
     const galleryContainer = document.getElementById('gallery-container');
     
-    const imageUrls = [
-        'https://picsum.photos/300/200?random=1',
-        'https://picsum.photos/300/200?random=2',
-        'https://picsum.photos/300/200?random=3',
-        'https://picsum.photos/300/200?random=4',
-        'https://picsum.photos/300/200?random=5',
-        'https://picsum.photos/300/200?random=6'
+    const localImages = [
+        'images/image1.jpg',
+        'images/image2.jpg',
+        'images/image3.jpg',
+        'images/image4.jpg',
+        'images/image5.jpg',
+        'images/image6.jpg'
     ];
 
     galleryContainer.innerHTML = '';
 
-    imageUrls.forEach(async (url, index) => {
+    for (let i = 0; i < localImages.length; i++) {
         try {
+            const url = localImages[i];
+            
             const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Nie znaleziono pliku: ${url}`);
+            }
+
             const blob = await response.blob();
             const objectURL = URL.createObjectURL(blob);
+
             const img = document.createElement('img');
             img.src = objectURL;
-            img.alt = `Image ${index + 1}`;
+            img.alt = `Gallery Image ${i + 1}`;
             img.style.width = '100%';
             img.style.borderRadius = '5px';
+            img.style.cursor = 'pointer';
             
             img.loading = 'lazy'; 
 
-            img.style.cursor = 'pointer';
             img.addEventListener('click', () => openModal(objectURL));
 
             galleryContainer.appendChild(img);
+
         } catch (error) {
-            console.error('Błąd ładowania obrazka:', error);
+            console.error('Błąd wczytywania:', error);
+            const errorMsg = document.createElement('p');
+            errorMsg.innerText = `Brak pliku: ${localImages[i]}`;
+            errorMsg.style.color = 'red';
+            galleryContainer.appendChild(errorMsg);
         }
-    });
+    }
 }
 
+// Funkcja modala pozostaje bez zmian
 function openModal(imageSrc) {
     const modal = document.createElement('div');
     modal.style.position = 'fixed';
